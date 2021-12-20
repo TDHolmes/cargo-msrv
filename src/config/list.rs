@@ -1,21 +1,24 @@
 use clap::ArgMatches;
-use std::str::FromStr;
+use std::{convert::TryFrom, str::FromStr};
 
 #[derive(Clone, Debug)]
 pub struct ListCmdConfig {
     pub variant: ListVariant,
 }
 
-impl ListCmdConfig {
-    pub fn from_args(args: &ArgMatches) -> Self {
+impl<'a> TryFrom<&'a ArgMatches<'a>> for ListCmdConfig {
+    type Error = crate::CargoMSRVError;
+
+    fn try_from(args: &'a ArgMatches) -> Result<Self, Self::Error> {
         use crate::cli::id;
 
-        let variant = args
-            .value_of(id::SUB_COMMAND_LIST_VARIANT)
-            .map(|var| ListVariant::from_str(var).expect("this is infallible, since clap ensures the input is valid"))
-            .unwrap_or_default();
+        let variant = if let Some(var) = args.value_of(id::SUB_COMMAND_LIST_VARIANT) {
+            ListVariant::from_str(var)?
+        } else {
+            ListVariant::default()
+        };
 
-        ListCmdConfig { variant }
+        Ok(ListCmdConfig { variant })
     }
 }
 
