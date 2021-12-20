@@ -12,7 +12,7 @@ impl ListCmdConfig {
 
         let variant = args
             .value_of(id::SUB_COMMAND_LIST_VARIANT)
-            .map(|var| ListVariant::from_str(var).expect("clap should have handled this"))
+            .map(|var| ListVariant::from_str(var).expect("this is infallible, since clap ensures the input is valid"))
             .unwrap_or_default();
 
         ListCmdConfig { variant }
